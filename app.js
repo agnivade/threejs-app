@@ -14,6 +14,8 @@ function init() {
     console.log("System does not support antialiasing- " + ex.message + ". Using a normal WebGL Renderer.");
     renderer = new THREE.WebGLRenderer();
   }
+  renderer.shadowMapEnabled = true;
+  //renderer.shadowMapSoft = true;
   renderer.setSize(WIDTH, HEIGHT);
   document.body.appendChild(renderer.domElement);
 
@@ -30,9 +32,17 @@ function init() {
                           1); // opacity
  
   //create a light
-  var light = new THREE.PointLight(0xffffff);
+  var light = new THREE.SpotLight(0xE8D04A);
   light.position.set(0,200,300);
   light.name = "light";
+  light.castShadow = true;
+
+  light.shadowMapWidth = 1024;
+  light.shadowMapHeight = 1024;
+
+  light.shadowCameraNear = 500;
+  light.shadowCameraFar = 4000;
+  light.shadowCameraFov = 30;
   scene.add(light);
 
   //add a cube to the scene  
@@ -40,7 +50,20 @@ function init() {
   var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
   var cube = new THREE.Mesh(geometry, material);
   cube.name = "cube";
+  cube.castShadow = true;
+  cube.receiveShadow = true;
   scene.add(cube);
+
+  // draw a floor (plane) for the cube to sit on 
+  var planeGeometry = new THREE.PlaneBufferGeometry(20, 20);
+  var planeMaterial = new THREE.MeshPhongMaterial({ color: "yellow" });  
+  var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+  // make the plane recieve shadow from the cube
+  plane.receiveShadow = true;
+  plane.castShadow = true;
+  plane.rotation.x = -0.5 * Math.PI;
+  plane.position.y = -1;
+  scene.add(plane);
 
   // Adding a orbit controls element
   controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -48,13 +71,13 @@ function init() {
 }
 
 function animate() {
-	requestAnimationFrame(animate);
+  requestAnimationFrame(animate);
 
   // rotating the cube bit by bit
-	scene.getObjectByName("cube").rotation.x += 0.1;
-	scene.getObjectByName("cube").rotation.y += 0.1;
+  scene.getObjectByName("cube").rotation.x += 0.1;
+  scene.getObjectByName("cube").rotation.y += 0.1;
 
-	renderer.render(scene, camera);
+  renderer.render(scene, camera);
   controls.update();
 }
 

@@ -15,7 +15,7 @@ function init() {
     renderer = new THREE.WebGLRenderer();
   }
   renderer.shadowMapEnabled = true;
-  //renderer.shadowMapSoft = true;
+  renderer.shadowMapSoft = true;
   renderer.setSize(WIDTH, HEIGHT);
   renderer.setClearColor(0x333F47, // color
                           1); // opacity
@@ -33,30 +33,30 @@ function init() {
   
  
   //create a light
-  var ambient = new THREE.AmbientLight("white");
-  scene.add(ambient);
+  //var ambient = new THREE.AmbientLight("white");
+  //scene.add(ambient);
 
 
   // add a spotlight to illuminate the cube and cause shadows            
   spotLight = new THREE.SpotLight("green");
-
   //spotLight = new THREE.DirectionalLight(0xdfebff, 1.75);
   spotLight.name = "spotLight";
   spotLight.position.set(4, 4, 1);
-
-  
-
   spotLight.castShadow = true;
   spotLight.shadowMapWidth = 512;
   spotLight.shadowMapHeight = 512;
   spotLight.intensity = 1;
   spotLight.shadowDarkness = 0.1;
-  spotLight.shadowCameraNear = true;   // this line makes the shadow appear, hooray!
+  spotLight.shadowCameraNear = true;
+  
+  //spotLight.shadowCameraNear = 500;
+  spotLight.shadowCameraFar = 4000;
+  spotLight.shadowCameraFov = 30;
 
   scene.add(spotLight);
 
   //add a cube to the scene  
-  var geometry = new THREE.CubeGeometry(0.5, 0.5, 0.5);
+  var geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
   var material = new THREE.MeshPhongMaterial({ color: "yellow", ambient: "white", shininess: 9, metal: true, reflectivity: 9 });
   var cube = new THREE.Mesh(geometry, material);
   cube.name = "cube";

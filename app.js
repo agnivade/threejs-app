@@ -1,5 +1,6 @@
 // Gloval variables required
 var scene, camera, renderer, controls;
+var p_by_b = 4.242 // just a HACK for now, need to be actually computed
 
 // Initialising all the required elements to render the scene
 function init() {
@@ -33,20 +34,20 @@ function init() {
   
  
   //create a light
-  //var ambient = new THREE.AmbientLight("white");
-  //scene.add(ambient);
+  var ambient = new THREE.AmbientLight(0x404040);
+  scene.add(ambient);
 
 
   // add a spotlight to illuminate the cube and cause shadows            
-  spotLight = new THREE.SpotLight("green");
+  spotLight = new THREE.SpotLight("red");
   //spotLight = new THREE.DirectionalLight(0xdfebff, 1.75);
   spotLight.name = "spotLight";
-  spotLight.position.set(4, 4, 1);
+  spotLight.position.set(3, 2, 3);
   spotLight.castShadow = true;
   spotLight.shadowMapWidth = 512;
   spotLight.shadowMapHeight = 512;
-  spotLight.intensity = 1;
-  spotLight.shadowDarkness = 0.1;
+  spotLight.intensity = 2;
+  spotLight.shadowDarkness = 0.3;
   spotLight.shadowCameraNear = true;
   
   //spotLight.shadowCameraNear = 500;
@@ -86,6 +87,20 @@ function animate() {
   // rotating the cube bit by bit
   scene.getObjectByName("cube").rotation.x += 0.01 * 0.3;
   scene.getObjectByName("cube").rotation.y += 0.01 * 0.5;
+
+  // rotating the light in a circle
+  // calculating the x and z coordinates
+  var x = scene.getObjectByName("spotLight").position.x;
+  var z = scene.getObjectByName("spotLight").position.z;
+  var y = scene.getObjectByName("spotLight").position.y;
+  var theta = Math.degrees(Math.atan(x / z));
+  theta += 0.1;
+  if (Math.round(theta) == 360) {
+    theta = 0;
+  }
+  x = p_by_b * Math.sin(Math.radians(theta));
+  z = p_by_b * Math.cos(Math.radians(theta));
+  scene.getObjectByName("spotLight").position.set(x,y,z);
 
   renderer.render(scene, camera);
   controls.update();

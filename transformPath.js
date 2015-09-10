@@ -127,7 +127,6 @@ function transformSVGPath(pathStr) {
   activeCmd = pathStr[0];
   while (idx <= len) {
     canRepeat = true;
-    console.log('active cmd is - ' + activeCmd);
     switch (activeCmd) {
         // moveto commands, become lineto's if repeated
       case 'M':

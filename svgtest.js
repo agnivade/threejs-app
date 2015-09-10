@@ -27,7 +27,8 @@ function init() {
                             WIDTH / HEIGHT, //  Aspect ratio
                             0.1, // Near distance
                             10000); // Far distance
-  camera.position.set(1,1,1);
+  camera.position.set(300,300,-150);
+  camera.lookAt(0,0,0)
   camera.name = "camera";
   scene.add(camera);
 
@@ -56,24 +57,7 @@ function init() {
 
   scene.add(spotLight);*/
 
-  //add a cube to the scene
-  /*var geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-  var material = new THREE.MeshPhongMaterial({ color: "yellow", ambient: "white", shininess: 9, metal: true, reflectivity: 9 });
-  var cube = new THREE.Mesh(geometry, material);
-  cube.name = "cube";
-  cube.castShadow = true;
-  cube.receiveShadow = true;
-  scene.add(cube);*/
-
-
-  /*var closedSpline = new THREE.ClosedSplineCurve3( [
-    new THREE.Vector3( -60, -100,  60 ),
-    new THREE.Vector3( -60,   20,  60 ),
-    new THREE.Vector3( -60,  120,  60 ),
-    new THREE.Vector3(  60,   20, -60 ),
-    new THREE.Vector3(  60, -100, -60 )
-  ] );*/
-
+  var object = new THREE.Object3D();
   var extrusionSettings = {
     amount: 20,
     bevelEnabled: true,
@@ -83,27 +67,31 @@ function init() {
     material: 0,
     extrudeMaterial: 1
   };
-  //for (var i = 0; i < paths.length; i++) {
-    var shape = transformSVGPath(paths[2]);
+  for (var i = 0; i < paths.length; i++) {
+    var path = paths[i];
+    // XXX: ideally, an object will be returned based on the path and we should
+    // do getShape() and getHole() on that path. eg - if obj.hasHoles.
+    var shape;
+    // This returns the first index of z, and hence an indication to split the svg path into shapes and holes
+    var indexOfz = path.indexOf('z');
+    // Checking if the svg path has holes in it
+    if (indexOfz != -1 && indexOfz != path.length-1) {
+      var path_main = path.substr(0, indexOfz+1).trim();
+      var path_hole = path.substr(indexOfz+1).trim();
+      shape = transformSVGPath(path_main);
+      var hole = transformSVGPath(path_hole);
+      shape.holes.push(hole);
+    } else {
+      shape = transformSVGPath(path);
+    }
     var geometry = new THREE.ExtrudeGeometry(shape, extrusionSettings);
     var material = new THREE.MeshLambertMaterial({ color: 0xb00000, wireframe: false } );
     var mesh = new THREE.Mesh(geometry, material);
     mesh.receiveShadow = true;
     mesh.castShadow = true;
-    scene.add(mesh);
-  //}
-
-  // draw a floor (plane) for the cube to sit on
-  var planeGeometry = new THREE.PlaneBufferGeometry(5, 5);
-  var planeMaterial = new THREE.MeshPhongMaterial({ color: "yellow" });
-  var plane = new THREE.Mesh(planeGeometry, planeMaterial);
-  plane.name = "plane";
-  // make the plane recieve shadow from the cube
-  plane.receiveShadow = true;
-  plane.castShadow = true;
-  plane.rotation.x = -0.5 * Math.PI;
-  plane.position.y = -1;
-  scene.add(plane);
+    object.add(mesh);
+  }
+  scene.add(object);
 
   // Adding a orbit controls element
   controls = new THREE.OrbitControls(camera, renderer.domElement);
